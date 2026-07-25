@@ -1,7 +1,7 @@
 import javax.swing.ImageIcon;
 import java.awt.Image;
 
-public class MyPhoto {
+public class MyImage {
     public Image wallImage;
     public Image pacmanRightImage;
     public Image redGhostImage;
