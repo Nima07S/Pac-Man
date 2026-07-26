@@ -24,8 +24,8 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
     ArrayList<Block> pellets = new ArrayList<>();
     ArrayList<Block> ghosts = new ArrayList<>();
 
-    Pacman player = new Pacman(SIZE*9, SIZE*15, 32, 32, images.pacmanRightImage);
-
+    Pacman player = new Pacman(SIZE*9, SIZE*15, 32, 32, null);
+    
     Timer loop;
 
     public MyPanel () {
@@ -53,6 +53,8 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
         images.loadWall();
         images.loadPacman();
         images.loadGhosts();
+
+        player.img = images.pacmanRightImage;
         
         for (int i=0; i<map.maze.length; i++) {
             for (int j=0; j<map.maze[i].length(); j++) {
@@ -100,7 +102,7 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
             g.drawImage(w.img, w.x, w.y, w.width, w.height, null);
         }
 
-        g.drawImage(images.pacmanRightImage, player.x, player.y, player.width, player.height, null);
+        g.drawImage(player.img, player.x, player.y, player.width, player.height, null);
         
         g.setColor(Color.WHITE);
         for (Block p: pellets) {
@@ -142,6 +144,11 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
         }
         else
             player.stop();
+
+        if (player.x + player.width/2 == 0 && player.direction == 'L')
+            player.x = width - player.x;
+        else if (player.x == width - player.width/2 && player.direction == 'R')
+            player.x =  -1 * player.width/2;
     }
 
     @Override
@@ -162,6 +169,15 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
             if (!checkDirectionCollision ('L'))
                 player.updateDirection('L');
         }
+
+        if (player.direction == 'U')
+            player.img = images.pacmanUpImage;
+        else if (player.direction == 'D')
+            player.img = images.pacmanDownImage;
+        else if (player.direction == 'R')
+            player.img = images.pacmanRightImage;
+        else if (player.direction == 'L')
+            player.img = images.pacmanLeftImage;
     }
 
     @Override
@@ -175,7 +191,6 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
         }
         else if (e.getSource() == exitButton)
             System.exit(0);
-        
     }
 
     @Override
