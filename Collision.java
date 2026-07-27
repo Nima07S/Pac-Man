@@ -8,4 +8,11 @@ public class Collision {
         Boolean check = playerRect.intersects(blockRect);
         return check;
     }
+
+    public static boolean checkCollision (Block p, Block b) {
+        Rectangle playerRect = new Rectangle(p.x, p.y, p.width, p.height);
+        Rectangle blockRect = new Rectangle(b.x, b.y, b.width, b.height);
+        Boolean check = playerRect.intersects(blockRect);
+        return check;
+    }
 }
