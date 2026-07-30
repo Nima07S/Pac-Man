@@ -7,7 +7,7 @@ import java.awt.event.*;
 
 public class MyPanel extends JPanel implements ActionListener, KeyListener {
     final int SIZE = 32;
-    int row = 21, column = 19;
+    int row = 22, column = 19;
     int width = SIZE*column;
     int height = SIZE*row;
 
@@ -21,9 +21,11 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
     ArrayList<Block> pellets = new ArrayList<>();
     ArrayList<Ghost> ghosts = new ArrayList<>();
 
-    Pacman player = new Pacman(SIZE*9, SIZE*15, 32, 32, null);
+    Pacman player = new Pacman(SIZE*9, SIZE*16, 32, 32, null);
     
     boolean isGameStarted = false;
+
+    ScoreManager info = new ScoreManager(0, 1);
 
     Timer loop;
 
@@ -67,19 +69,19 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
                         pellets.add(pellet);
                         break;
                     case 'R':
-                        Ghost redGhost = new Ghost(SIZE*9, SIZE*8, SIZE, SIZE, images.redGhostImage);
+                        Ghost redGhost = new Ghost(SIZE*9, SIZE*9, SIZE, SIZE, images.redGhostImage);
                         ghosts.add(redGhost);
                         break;
                     case 'G':
-                        Ghost greenGhost = new Ghost(SIZE*8, SIZE*9, SIZE, SIZE, images.greenGhostImage);
+                        Ghost greenGhost = new Ghost(SIZE*8, SIZE*10, SIZE, SIZE, images.greenGhostImage);
                         ghosts.add(greenGhost);
                         break;
                     case 'O':
-                        Ghost orangeGhost = new Ghost(SIZE*10, SIZE*9, SIZE, SIZE, images.orangeGhostImage);
+                        Ghost orangeGhost = new Ghost(SIZE*10, SIZE*10, SIZE, SIZE, images.orangeGhostImage);
                         ghosts.add(orangeGhost);
                         break;
                     case 'P':
-                        Ghost pinkGhost = new Ghost(SIZE*9, SIZE*10, SIZE, SIZE, images.pinkGhostImage);
+                        Ghost pinkGhost = new Ghost(SIZE*9, SIZE*11, SIZE, SIZE, images.pinkGhostImage);
                         ghosts.add(pinkGhost);
                 }
             }
@@ -94,6 +96,10 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
     public void paintComponent (Graphics g) {
         super.paintComponent(g);
         draw(g);
+        if (!isGameStarted) {
+            g.setColor(new Color(0, 0, 0, 170));
+            g.fillRect(0, 0, width, height);
+        }
     }
 
     public void draw (Graphics g) {
@@ -110,6 +116,10 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
 
         for (Block G: ghosts) 
             g.drawImage(G.img, G.x, G.y, G.width, G.height, null);
+
+        g.setFont(new Font("Tahoma", Font.PLAIN, 20));
+        g.drawString("Score: " + info.getScore(), 8, 24);
+        g.drawString("Lives: " + info.getLives(), 128, 24);
     }
 
     private boolean checkDirectionCollision (char ch) {
@@ -139,8 +149,8 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
     public void move () {
         if (isGameStarted) {
             if (!checkVelocityCollision(player.xVelocity, player.yVelocity)) {
-            player.x += player.xVelocity;
-            player.y += player.yVelocity;
+                player.x += player.xVelocity;
+                player.y += player.yVelocity;
             }
             else
                 player.stop();
@@ -152,26 +162,60 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
 
             Ghost.ghostsMove(ghosts, walls);
             player.pacmanPelletCollision(player, pellets);
+
+            for (Ghost ghost: ghosts) {
+                if (Collision.checkCollision(player, ghost)) {
+                    info.liveDecrement();
+                    player.resetPosition();
+                    for (Ghost g: ghosts)
+                        g.resetPosition();
+                    if (info.getLives() == 0) {
+                        isGameStarted = false;
+                        pellets.clear();
+                        for (int i=0; i<map.maze.length; i++) {
+                            for (int j=0; j<map.maze[i].length(); j++) {
+                                if (map.maze[i].charAt(j) == ' ') {
+                                    Block pellet = new Block(j*32+13, i*32+13, 6, 6, null);
+                                    pellets.add(pellet);
+                                }
+                            }
+                        }
+                        startButton.setVisible(true);
+                        exitButton.setVisible(true);
+                        info.resetInfo();
+                        break;
+                    }
+                    break;
+                }
+            }
         }  
     }
 
     @Override
     public void keyPressed (KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_UP) {
-            if (!checkDirectionCollision('U'))
+            if (!checkDirectionCollision('U')) {
                 player.updateDirection('U');
+                info.scoreDecrement();
+            }
         }
         else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            if (!checkDirectionCollision('D'))
+            if (!checkDirectionCollision('D')) {
                 player.updateDirection('D');
+                info.scoreDecrement();
+            }
         }
         else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            if (!checkDirectionCollision('R'))
+            if (!checkDirectionCollision('R')) {
                 player.updateDirection('R');
+                info.scoreDecrement();
+            }
         }
         else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            if (!checkDirectionCollision ('L'))
+            if (!checkDirectionCollision('L')) {
                 player.updateDirection('L');
+                info.scoreDecrement();
+            }
         }
 
         if (player.direction == 'U')
@@ -193,10 +237,9 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
             isGameStarted = true;
             startButton.setVisible(false);
             exitButton.setVisible(false);
-        }
+            }
         else if (e.getSource() == exitButton)
             System.exit(0);
-        
     }
 
     @Override

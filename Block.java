@@ -7,6 +7,10 @@ public class Block {
     public int xVelocity, yVelocity;
     public char direction;
     public char preDirection;
+    protected int firstX;
+    protected int firstY;
+    private int firstWidth;
+    private int firstHeight;
 
     public Block (int x, int y, int width, int height, Image img) {
         this.x = x;
@@ -14,6 +18,10 @@ public class Block {
         this.width = width;
         this.height = height;
         this.img = img;
+        firstX = x;
+        firstY = y;
+        this.firstHeight = height;
+        this.firstWidth = width;
     }
 
     public void updateVelocity () {
@@ -54,5 +62,12 @@ public class Block {
         preDirection = direction;
         direction = ch;
         updateVelocity();
-    } 
+    }
+
+    public void resetPosition () {
+        x = firstX;
+        y = firstY;
+        width = firstWidth;
+        height = firstHeight;
+    }
 }

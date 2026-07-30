@@ -8,6 +8,8 @@ public class Ghost extends Block {
 
     public Ghost (int x, int y, int width, int height, Image img) {
         super(x, y, width, height, img);
+        firstX = x;
+        firstY = y;
         generateRandomDir();
     }
 
@@ -29,5 +31,10 @@ public class Ghost extends Block {
 
     public void generateRandomDir () {
         direction = directions[randDir.nextInt(4)];
+    }
+
+    public void resetPosition () {
+        x = firstX;
+        y = firstY;
     }
 }
