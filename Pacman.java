@@ -4,11 +4,12 @@ import java.util.ArrayList;
 public class Pacman extends Block {
     public static Block eatenPellet;
     public static int eatenPelletCount;
+    public static int c = 0;
 
     public Pacman (int x, int y, int width, int height, Image img) {
         super(x, y, width, height, img);
-        firstX = 9*32;
-        firstY = 16*32;
+        firstX = x;
+        firstY = y;
         eatenPelletCount = 0;
     }
 
@@ -16,11 +17,13 @@ public class Pacman extends Block {
         for (Block f: foods) {
             if (Collision.checkCollision(p, f)) {
                 eatenPellet = f;
-                eatenPelletCount++;
+                ScoreManager.addScore(10);
+                c++;
                 break;
             }
         }
         foods.remove(eatenPellet);
+        eatenPellet = null;
     }
 
     @Override

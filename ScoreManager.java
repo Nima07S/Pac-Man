@@ -1,17 +1,16 @@
 public class ScoreManager {
     private int lives;
-    private int score = 0;
+    private static int score = 0;
 
-    public ScoreManager (int score, int lives) {
+    public ScoreManager (int lives) {
         this.lives = lives;
-        this.score = score;
     }
-    public int getScore () {
-        return score + Pacman.eatenPelletCount * 10;
+    public static int getScore () {
+        return score;
     }
 
-    public void setScore (int score) {
-        this.score = score;
+    public static void setScore (int s) {
+        ScoreManager.score = s;
     }
 
     public int getLives () {
@@ -23,9 +22,8 @@ public class ScoreManager {
     }
 
     public void resetInfo () {
-        lives = 1;
-        score = 0;
-        Pacman.eatenPelletCount = 0;
+        lives = 100;
+        setScore(0);
     }
 
     public void liveDecrement () {
@@ -34,5 +32,9 @@ public class ScoreManager {
 
     public void scoreDecrement () {
         score--;
+    }
+
+    public static void addScore (int s) {
+        score += s;
     }
 }

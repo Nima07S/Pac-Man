@@ -14,6 +14,8 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
     JButton startButton;
     JButton exitButton;
 
+    int counter = 0;
+
     MyImage images = new MyImage();
     Map map = new Map();
 
@@ -24,8 +26,10 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
     Pacman player = new Pacman(SIZE*9, SIZE*16, 32, 32, null);
     
     boolean isGameStarted = false;
+    boolean eatenAllPellets = false;
+    boolean playerWon = false;
 
-    ScoreManager info = new ScoreManager(0, 1);
+    ScoreManager info = new ScoreManager(100);
 
     Timer loop;
 
@@ -37,12 +41,12 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
        
         startButton = new JButton();
         startButton.setText("START");
-        startButton.setBounds(240, 150, 120, 80);
+        startButton.setBounds(240, 200, 120, 80);
         startButton.addActionListener(this);
 
         exitButton = new JButton();
         exitButton.setText("EXIT");
-        exitButton.setBounds(240, 350, 120, 80);
+        exitButton.setBounds(240, 400, 120, 80);
         exitButton.addActionListener(this);
 
         add(startButton);
@@ -57,9 +61,9 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
 
         player.img = images.pacmanRightImage;
         
-        for (int i=0; i<map.maze.length; i++) {
-            for (int j=0; j<map.maze[i].length(); j++) {
-                switch (map.maze[i].charAt(j)) {
+        for (int i=0; i<map.getMaze().length; i++) {
+            for (int j=0; j<map.getMaze()[i].length(); j++) {
+                switch (map.getMaze()[i].charAt(j)) {
                     case 'x':
                         Block wall = new Block(32*j, 32*i, SIZE, SIZE, images.wallImage);
                         walls.add(wall);
@@ -96,10 +100,6 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
     public void paintComponent (Graphics g) {
         super.paintComponent(g);
         draw(g);
-        if (!isGameStarted) {
-            g.setColor(new Color(0, 0, 0, 170));
-            g.fillRect(0, 0, width, height);
-        }
     }
 
     public void draw (Graphics g) {
@@ -117,9 +117,23 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
         for (Block G: ghosts) 
             g.drawImage(G.img, G.x, G.y, G.width, G.height, null);
 
-        g.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        g.drawString("Score: " + info.getScore(), 8, 24);
-        g.drawString("Lives: " + info.getLives(), 128, 24);
+        g.setFont(new Font("Airal", Font.PLAIN, 20));
+        g.drawString("Score: " + ScoreManager.getScore(), 8, 24);
+        g.drawString("Lives: " + info.getLives(), 160, 24);
+
+        
+        if (!isGameStarted) {
+            g.setColor(new Color(0, 0, 0, 170));
+            g.fillRect(0, 0, width, height);
+        }
+        
+        if (!isGameStarted && playerWon) {
+            startButton.setVisible(true);exitButton.setVisible(true);
+            g.setColor(Color.WHITE);
+            g.drawString("You Won!", 400, 300);
+            g.drawString("You ate all the pellets.", 350, 500);
+            g.drawString("" + ScoreManager.getScore(), 500, 400);
+        }  
     }
 
     private boolean checkDirectionCollision (char ch) {
@@ -171,15 +185,6 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
                         g.resetPosition();
                     if (info.getLives() == 0) {
                         isGameStarted = false;
-                        pellets.clear();
-                        for (int i=0; i<map.maze.length; i++) {
-                            for (int j=0; j<map.maze[i].length(); j++) {
-                                if (map.maze[i].charAt(j) == ' ') {
-                                    Block pellet = new Block(j*32+13, i*32+13, 6, 6, null);
-                                    pellets.add(pellet);
-                                }
-                            }
-                        }
                         startButton.setVisible(true);
                         exitButton.setVisible(true);
                         info.resetInfo();
@@ -188,7 +193,18 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
                     break;
                 }
             }
-        }  
+
+            if (pellets.isEmpty()) {
+                ScoreManager.addScore(500);
+                isGameStarted = false;
+                eatenAllPellets = true;
+                playerWon = true;
+                System.out.println(Pacman.c*10);
+                System.out.println(counter);
+                System.out.println(Pacman.c*10 - counter);
+            }
+        }
+        
     }
 
     @Override
@@ -196,25 +212,29 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_UP) {
             if (!checkDirectionCollision('U')) {
                 player.updateDirection('U');
-                info.scoreDecrement();
+                ScoreManager.addScore(-1);
+                counter++;
             }
         }
         else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
             if (!checkDirectionCollision('D')) {
                 player.updateDirection('D');
-                info.scoreDecrement();
+                ScoreManager.addScore(-1);
+                counter++;
             }
         }
         else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
             if (!checkDirectionCollision('R')) {
                 player.updateDirection('R');
-                info.scoreDecrement();
+                ScoreManager.addScore(-1);
+                counter++;
             }
         }
         else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
             if (!checkDirectionCollision('L')) {
                 player.updateDirection('L');
-                info.scoreDecrement();
+                ScoreManager.addScore(-1);
+                counter++;
             }
         }
 
@@ -234,10 +254,21 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
         repaint();
          
         if (e.getSource() == startButton) {
+            info.resetInfo();
             isGameStarted = true;
+            for (Ghost g: ghosts)
+                g.resetPosition();
+            player.resetPosition();
+            pellets.clear();
+            Pellet.loadPellets(pellets, map);
             startButton.setVisible(false);
             exitButton.setVisible(false);
+            eatenAllPellets = false;
+            if (info.getLives() == 0 || pellets.isEmpty()) {
+                Pellet.loadPellets(pellets, map);
+                eatenAllPellets = false;
             }
+        }
         else if (e.getSource() == exitButton)
             System.exit(0);
     }
@@ -247,4 +278,5 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyTyped (KeyEvent e) {}
+    
 }

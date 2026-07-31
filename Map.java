@@ -23,4 +23,8 @@ public class Map {
         "x                 x",
         "xxxxxxxxxxxxxxxxxxx"
     };
+
+    public String[] getMaze () {
+        return maze;
+    }
 }
