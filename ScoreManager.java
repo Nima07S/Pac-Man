@@ -22,7 +22,7 @@ public class ScoreManager {
     }
 
     public void resetInfo () {
-        lives = 100;
+        lives = 3;
         setScore(0);
     }
 

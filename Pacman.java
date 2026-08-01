@@ -4,7 +4,6 @@ import java.util.ArrayList;
 public class Pacman extends Block {
     public static Block eatenPellet;
     public static int eatenPelletCount;
-    public static int c = 0;
 
     public Pacman (int x, int y, int width, int height, Image img) {
         super(x, y, width, height, img);
@@ -18,7 +17,6 @@ public class Pacman extends Block {
             if (Collision.checkCollision(p, f)) {
                 eatenPellet = f;
                 ScoreManager.addScore(10);
-                c++;
                 break;
             }
         }
