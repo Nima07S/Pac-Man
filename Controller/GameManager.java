@@ -1,3 +1,8 @@
+package Controller;
+
+import Model.Block;
+import Model.ScoreManager;
+
 import java.util.ArrayList;
 
 public class GameManager {

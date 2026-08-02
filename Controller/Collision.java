@@ -1,3 +1,8 @@
+package Controller;
+
+import Model.Block;
+import Model.Pacman;
+
 import java.awt.Rectangle;
 import java.util.ArrayList;
 

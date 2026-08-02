@@ -1,3 +1,5 @@
+package Model;
+
 public class ScoreManager {
     private int lives;
     private static int score = 0;
@@ -22,7 +24,7 @@ public class ScoreManager {
     }
 
     public void resetInfo () {
-        lives = 3;
+        lives = 5;
         setScore(0);
     }
 

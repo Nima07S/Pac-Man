@@ -1,3 +1,8 @@
+package Controller;
+
+import View.MyFrame;
+import View.MyPanel;
+
 public class Game {
     public static void main (String[] args) {
         MyFrame frame = new MyFrame();
