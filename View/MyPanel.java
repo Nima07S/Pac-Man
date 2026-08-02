@@ -36,7 +36,15 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
 
     Timer loop;
 
-    public MyPanel () {
+    Database db;
+    int highScore = 0;
+    String highScoreName = "";
+
+    public MyPanel (Database database) {
+        db = database;
+        highScore = db.highScore();
+        highScoreName = db.highScoreName();
+
         setPreferredSize(new Dimension(width, height));
         setBackground(Color.BLACK);
         
@@ -102,7 +110,7 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
         g.setFont(new Font("Airal", Font.PLAIN, 20));
         g.drawString("Score: " + ScoreManager.getScore(), 8, 24);
         g.drawString("Lives: " + info.getLives(), 160, 24);
-        g.drawString("High Score: " + username + " " + ScoreManager.getScore(), 360, 24);
+        g.drawString("High Score: " + highScoreName + " " + highScore, 300, 24);
         
         if (!gameManager.isGameStarted) {
             g.setColor(new Color(0, 0, 0, 170));
@@ -133,6 +141,9 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
                     for (Ghost g: ghosts)
                         g.resetPosition();
                     if (info.getLives() == 0) {
+                        db.addRecord(username, ScoreManager.getScore());
+                        highScore = db.highScore();
+                        highScoreName = db.highScoreName();
                         gameManager.isGameStarted = false;
                         gameManager.playerWon = false;
                         MyButton.showButtons();
@@ -143,7 +154,11 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
                     break;
                 }
             }
-            gameManager.checkWinnig(pellets);
+            if (gameManager.checkWinnig(pellets)) {
+                db.addRecord(username, ScoreManager.getScore());
+                highScore = db.highScore();
+                username = db.highScoreName();
+            }
         }
     }
 
@@ -210,8 +225,10 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
                 gameManager.eatenAllPellets = false;
             }
         }
-        else if (e.getSource() == exitButton)
+        else if (e.getSource() == exitButton) {
+            db.disconnect();
             System.exit(0);
+        }
     }
 
     @Override
