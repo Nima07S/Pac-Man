@@ -1,7 +1,5 @@
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JTextField;
 import java.awt.*;
 import java.util.ArrayList;
@@ -13,10 +11,10 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
     int width = SIZE*column;
     int height = SIZE*row;
 
-    JButton startButton;
-    JButton exitButton;
-    JLabel pacmanLabel;
-    JLabel winLabel;
+    MyButton startButton;
+    MyButton exitButton;
+    MyLabel pacmanLabel;
+    MyLabel winLabel;
     JTextField usernameField;
 
     String username = "";
@@ -29,13 +27,9 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
     ArrayList<Ghost> ghosts = new ArrayList<>();
 
     Pacman player = new Pacman(SIZE*9, SIZE*16, 32, 32, null);
-    
-    boolean isGameStarted = false;
-    boolean eatenAllPellets = false;
-    boolean playerWon = false;
-    boolean firstTime = true;
 
-    ScoreManager info = new ScoreManager(3);
+    ScoreManager info = new ScoreManager(5);
+    GameManager gameManager = new GameManager();
 
     Timer loop;
 
@@ -45,32 +39,17 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
         
         setLayout(null);
        
-        startButton = new JButton("START");
-        startButton.setFont(new Font("Arial", Font.BOLD, 22));
-        startButton.setBounds(130, 450, 120, 80);
-        startButton.addActionListener(this);
+        startButton = new MyButton("START", 22, 130, 450, 120, 80, this);
+        exitButton = new MyButton("EXIT", 22, 358, 450, 120, 80, this);
 
-        exitButton = new JButton("EXIT");
-        exitButton.setFont(new Font("Arial", Font.BOLD, 22));
-        exitButton.setBounds(358, 450, 120, 80);
-        exitButton.addActionListener(this);
-
-        pacmanLabel = new JLabel ("PacMan");
-        pacmanLabel.setFont(new Font("Arial", Font.BOLD, 75));
-        pacmanLabel.setBounds(150, 75, 400, 200);
-        pacmanLabel.setForeground(Color.YELLOW);
-
-        winLabel = new JLabel("You Won!");
-        winLabel.setForeground(Color.WHITE);
-        winLabel.setFont(new Font("Arial", Font.BOLD, 40));
-        winLabel.setBounds(200, 200, 300, 100);
+        pacmanLabel = new MyLabel ("PacMan", 75, Color.YELLOW, 150, 75, 400, 200);
+        winLabel = new MyLabel("You Won!", 40, Color.WHITE, 200, 200, 300, 100);
         winLabel.setVisible(false);
 
         usernameField = new JTextField("Enter your name");
         usernameField.setFont(new Font("Arial", Font.BOLD, 24));
         usernameField.setBounds(200, 300, 200, 70);
         usernameField.setVisible(true);
-
 
         add(startButton);
         add(exitButton);
@@ -87,35 +66,10 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
 
         player.img = images.pacmanRightImage;
         
-        for (int i=0; i<map.getMaze().length; i++) {
-            for (int j=0; j<map.getMaze()[i].length(); j++) {
-                switch (map.getMaze()[i].charAt(j)) {
-                    case 'x':
-                        Block wall = new Block(32*j, 32*i, SIZE, SIZE, images.wallImage);
-                        walls.add(wall);
-                        break;
-                    case ' ':
-                        Block pellet = new Block(j*32+13, i*32+13, 6, 6, null);
-                        pellets.add(pellet);
-                        break;
-                    case 'R':
-                        Ghost redGhost = new Ghost(SIZE*9, SIZE*9, SIZE, SIZE, images.redGhostImage);
-                        ghosts.add(redGhost);
-                        break;
-                    case 'G':
-                        Ghost greenGhost = new Ghost(SIZE*8, SIZE*10, SIZE, SIZE, images.greenGhostImage);
-                        ghosts.add(greenGhost);
-                        break;
-                    case 'O':
-                        Ghost orangeGhost = new Ghost(SIZE*10, SIZE*10, SIZE, SIZE, images.orangeGhostImage);
-                        ghosts.add(orangeGhost);
-                        break;
-                    case 'P':
-                        Ghost pinkGhost = new Ghost(SIZE*9, SIZE*11, SIZE, SIZE, images.pinkGhostImage);
-                        ghosts.add(pinkGhost);
-                }
-            }
-        }
+        map.loadMaze(walls, ghosts, pellets, images.wallImage, 
+                    images.redGhostImage, images.greenGhostImage, 
+                    images.orangeGhostImage, images.pinkGhostImage);
+                    
         // 1000 ms / 40 = 25 FPS
         loop = new Timer(40, this);
         loop.start();
@@ -145,51 +99,21 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
         g.setFont(new Font("Airal", Font.PLAIN, 20));
         g.drawString("Score: " + ScoreManager.getScore(), 8, 24);
         g.drawString("Lives: " + info.getLives(), 160, 24);
-        g.drawString("High Score: " + username + " - " + ScoreManager.getScore(), 360, 24);
+        g.drawString("High Score: " + username + " " + ScoreManager.getScore(), 360, 24);
         
-        if (!isGameStarted) {
+        if (!gameManager.isGameStarted) {
             g.setColor(new Color(0, 0, 0, 170));
             g.fillRect(0, 0, width, height);
-            startButton.setVisible(true);
-            exitButton.setVisible(true);
+            MyButton.showButtons();
             pacmanLabel.setVisible(true);
-            if (playerWon)
+            if (gameManager.playerWon)
                 winLabel.setVisible(true);
         } 
     }
 
-    private boolean checkDirectionCollision (char ch) {
-        if (ch == 'U')
-            return checkVelocityCollision (0, -8);
-        else if (ch == 'D')
-            return checkVelocityCollision (0, 8);
-        else if (ch == 'R')
-            return checkVelocityCollision(8, 0);
-        else if (ch == 'L')
-            return checkVelocityCollision(-8, 0);
-        return false;
-    }
-   
-    private boolean checkVelocityCollision(int xVelocity, int yVelocity) {
-        int tmpPlayerX = player.x;
-        int tmpPlayerY = player.y;
-        tmpPlayerX += xVelocity;
-        tmpPlayerY += yVelocity;
-        for (Block w: walls) {
-            if (Collision.checkCollision(tmpPlayerX, tmpPlayerY, player, w))
-                return true;
-        }
-        return false;
-    }
-
     public void move () {
-        if (isGameStarted) {
-            if (!checkVelocityCollision(player.xVelocity, player.yVelocity)) {
-                player.x += player.xVelocity;
-                player.y += player.yVelocity;
-            }
-            else
-                player.stop();
+        if (gameManager.isGameStarted) {
+            player.actualMove(walls, gameManager.isGameStarted);
 
             if (player.x + player.width/2 == 0 && player.direction == 'L')
                 player.x = width - player.x;
@@ -198,7 +122,7 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
 
             Ghost.ghostsMove(ghosts, walls);
             player.pacmanPelletCollision(player, pellets);
-
+        
             for (Ghost ghost: ghosts) {
                 if (Collision.checkCollision(player, ghost)) {
                     info.liveDecrement();
@@ -206,10 +130,9 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
                     for (Ghost g: ghosts)
                         g.resetPosition();
                     if (info.getLives() == 0) {
-                        isGameStarted = false;
-                        playerWon = false;
-                        startButton.setVisible(true);
-                        exitButton.setVisible(true);
+                        gameManager.isGameStarted = false;
+                        gameManager.playerWon = false;
+                        MyButton.showButtons();
                         pacmanLabel.setVisible(true);
                         info.resetInfo();
                         break;
@@ -217,38 +140,32 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
                     break;
                 }
             }
-
-            if (pellets.isEmpty()) {
-                ScoreManager.addScore(500);
-                isGameStarted = false;
-                eatenAllPellets = true;
-                playerWon = true;
-            }
-        }  
+            gameManager.checkWinnig(pellets);
+        }
     }
 
     @Override
     public void keyPressed (KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_UP) {
-            if (!checkDirectionCollision('U')) {
+            if (!Collision.checkDirectionCollision('U', player, walls)) {
                 player.updateDirection('U');
                 ScoreManager.addScore(-1);
             }
         }
         else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            if (!checkDirectionCollision('D')) {
+            if (!Collision.checkDirectionCollision('D', player, walls)) {
                 player.updateDirection('D');
                 ScoreManager.addScore(-1);
             }
         }
         else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            if (!checkDirectionCollision('R')) {
+            if (!Collision.checkDirectionCollision('R', player, walls)) {
                 player.updateDirection('R');
                 ScoreManager.addScore(-1);
             }
         }
         else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            if (!checkDirectionCollision('L')) {
+            if (!Collision.checkDirectionCollision('L', player, walls)) {
                 player.updateDirection('L');
                 ScoreManager.addScore(-1);
             }
@@ -270,26 +187,24 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
         repaint();
          
         if (e.getSource() == startButton) {
-            if (firstTime) {
+            if (gameManager.firstTime) {
                 username = usernameField.getText();
                 usernameField.setVisible(false);
-                firstTime = false;
+                gameManager.firstTime = false;
             }
             info.resetInfo();
-            isGameStarted = true;
+            gameManager.isGameStarted = true;
             for (Ghost g: ghosts)
                 g.resetPosition();
             player.resetPosition();
             pellets.clear();
             Pellet.loadPellets(pellets, map);
-            startButton.setVisible(false);
-            exitButton.setVisible(false);
-            pacmanLabel.setVisible(false);
-            winLabel.setVisible(false);
-            eatenAllPellets = false;
+            MyButton.hideButtons();
+            MyLabel.hideLabels(pacmanLabel, winLabel);
+            gameManager.eatenAllPellets = false;
             if (info.getLives() == 0 || pellets.isEmpty()) {
                 Pellet.loadPellets(pellets, map);
-                eatenAllPellets = false;
+                gameManager.eatenAllPellets = false;
             }
         }
         else if (e.getSource() == exitButton)

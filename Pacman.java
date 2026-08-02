@@ -30,4 +30,15 @@ public class Pacman extends Block {
         y = firstY;
         stop();
     }
+
+    public void actualMove (ArrayList<Block> walls, boolean isGameStarted) {
+        if (isGameStarted) {
+            if (!Collision.checkVelocityCollision(xVelocity, yVelocity, this, walls)) {
+                x += xVelocity;
+                y += yVelocity;
+            }
+            else
+                stop();
+        }
+    }
 }
