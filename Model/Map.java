@@ -1,12 +1,16 @@
 package Model;
 
+import View.MyImage;
 import java.util.ArrayList;
-import java.awt.Image;
 
 public class Map {
     private final int SIZE = 32;
+    private MyImage images;
+    private ArrayList<Block> walls;
+    private ArrayList<Block> pellets;
+    private ArrayList<Ghost> ghosts;
 
-    public String[] maze = {
+    private String[] maze = {
         "*******************",
         "xxxxxxxxxxxxxxxxxxx",
         "x        x        x",
@@ -31,16 +35,23 @@ public class Map {
         "xxxxxxxxxxxxxxxxxxx"
     };
 
+    public Map (MyImage imgs, ArrayList<Block> p, ArrayList<Block> w, ArrayList<Ghost> g) {
+        this.images = imgs;
+        this.ghosts = g;
+        this.pellets = p;
+        this.walls = w;
+    }
+
     public String[] getMaze () {
         return maze;
     }
 
-    public void loadMaze (ArrayList<Block> walls, ArrayList<Ghost> ghosts, ArrayList<Block> pellets, Image wI, Image rI, Image gI, Image oI, Image pI) {
-        for (int i=0; i<getMaze().length; i++) {
+    public void loadMaze () {
+        for (int i=0; i<maze.length; i++) {
             for (int j=0; j<getMaze()[i].length(); j++) {
                 switch (getMaze()[i].charAt(j)) {
                     case 'x':
-                        Block wall = new Block(32*j, 32*i, SIZE, SIZE, wI);
+                        Block wall = new Block(32*j, 32*i, SIZE, SIZE, images.wallImage);
                         walls.add(wall);
                         break;
                     case ' ':
@@ -48,19 +59,19 @@ public class Map {
                         pellets.add(pellet);
                         break;
                     case 'R':
-                        Ghost redGhost = new Ghost(SIZE*9, SIZE*9, SIZE, SIZE, rI);
+                        Ghost redGhost = new Ghost(SIZE*9, SIZE*9, SIZE, SIZE, images.redGhostImage);
                         ghosts.add(redGhost);
                         break;
                     case 'G':
-                        Ghost greenGhost = new Ghost(SIZE*8, SIZE*10, SIZE, SIZE, gI);
+                        Ghost greenGhost = new Ghost(SIZE*8, SIZE*10, SIZE, SIZE, images.greenGhostImage);
                         ghosts.add(greenGhost);
                         break;
                     case 'O':
-                        Ghost orangeGhost = new Ghost(SIZE*10, SIZE*10, SIZE, SIZE, oI);
+                        Ghost orangeGhost = new Ghost(SIZE*10, SIZE*10, SIZE, SIZE, images.orangeGhostImage);
                         ghosts.add(orangeGhost);
                         break;
                     case 'P':
-                        Ghost pinkGhost = new Ghost(SIZE*9, SIZE*11, SIZE, SIZE, pI);
+                        Ghost pinkGhost = new Ghost(SIZE*9, SIZE*11, SIZE, SIZE, images.pinkGhostImage);
                         ghosts.add(pinkGhost);
                 }
             }

@@ -11,12 +11,22 @@ public class GameManager {
     public boolean playerWon = false;
     public boolean firstTime = true;
 
-    public boolean checkWinnig (ArrayList<Block> pellets) {
+    public boolean checkWinning (ArrayList<Block> pellets) {
         if (pellets.isEmpty()) {
             ScoreManager.addScore(500);
             isGameStarted = false;
             eatenAllPellets = true;
             playerWon = true;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkGameOver (ScoreManager info) {
+        if (info.getLives() == 0) {
+            isGameStarted = false;
+            playerWon = false;
+            eatenAllPellets = false;
             return true;
         }
         return false;

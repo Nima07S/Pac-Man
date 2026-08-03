@@ -45,4 +45,11 @@ public class Pacman extends Block {
                 stop();
         }
     }
+
+    public void teleporting () {
+        if (x + width/2 == 0 && direction == 'L')
+            x = width*19 - x;
+        else if (x == width*19 - width/2 && direction == 'R')
+            x =  -1 * width/2;
+    }
 }

@@ -1,5 +1,7 @@
 package View;
 
+import Model.Pacman;
+
 import javax.swing.ImageIcon;
 import java.awt.Image;
 
@@ -32,5 +34,16 @@ public class MyImage {
         greenGhostImage = new ImageIcon(getClass().getResource("/assets/greenGhost.png")).getImage();
         orangeGhostImage = new ImageIcon(getClass().getResource("/assets/orangeGhost.png")).getImage();
         pinkGhostImage = new ImageIcon(getClass().getResource("/assets/pinkGhost.png")).getImage();
+    }
+
+    public void setPacManImage (Pacman player) {
+        if (player.direction == 'U')
+            player.img = pacmanUpImage;
+        else if (player.direction == 'D')
+            player.img = pacmanDownImage;
+        else if (player.direction == 'R')
+            player.img = pacmanRightImage;
+        else if (player.direction == 'L')
+            player.img = pacmanLeftImage;
     }
 }

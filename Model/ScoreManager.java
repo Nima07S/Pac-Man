@@ -24,7 +24,7 @@ public class ScoreManager {
     }
 
     public void resetInfo () {
-        lives = 5;
+        lives = 3;
         setScore(0);
     }
 

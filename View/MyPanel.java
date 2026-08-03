@@ -8,7 +8,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.awt.event.*;
 
-public class MyPanel extends JPanel implements ActionListener, KeyListener {
+public class MyPanel extends JPanel implements ActionListener {
     final int SIZE = 32;
     int row = 22, column = 19;
     int width = SIZE*column;
@@ -23,7 +23,6 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
     String username = "";
 
     MyImage images = new MyImage();
-    Map map = new Map();
 
     ArrayList<Block> walls = new ArrayList<>();
     ArrayList<Block> pellets = new ArrayList<>();
@@ -31,7 +30,9 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
 
     Pacman player = new Pacman(SIZE*9, SIZE*16, 32, 32, null);
 
-    ScoreManager info = new ScoreManager(5);
+    Map map = new Map(images, pellets, walls, ghosts);
+
+    ScoreManager info = new ScoreManager(3);
     GameManager gameManager = new GameManager();
 
     Timer loop;
@@ -39,6 +40,8 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
     Database db;
     int highScore = 0;
     String highScoreName = "";
+
+    Keyboard keyboard;
 
     public MyPanel (Database database) {
         db = database;
@@ -69,7 +72,8 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
         add(usernameField);
         
         setFocusable(true);
-        addKeyListener(this);
+        keyboard = new Keyboard(player, walls, images);
+        addKeyListener(keyboard);
 
         images.loadWall();
         images.loadPacman();
@@ -77,9 +81,7 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
 
         player.img = images.pacmanRightImage;
         
-        map.loadMaze(walls, ghosts, pellets, images.wallImage, 
-                    images.redGhostImage, images.greenGhostImage, 
-                    images.orangeGhostImage, images.pinkGhostImage);
+        map.loadMaze();
                     
         // 1000 ms / 40 = 25 FPS
         loop = new Timer(40, this);
@@ -125,12 +127,7 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
     public void move () {
         if (gameManager.isGameStarted) {
             player.actualMove(walls, gameManager.isGameStarted);
-
-            if (player.x + player.width/2 == 0 && player.direction == 'L')
-                player.x = width - player.x;
-            else if (player.x == width - player.width/2 && player.direction == 'R')
-                player.x =  -1 * player.width/2;
-
+            player.teleporting();
             Ghost.ghostsMove(ghosts, walls);
             player.pacmanPelletCollision(player, pellets);
         
@@ -140,63 +137,22 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
                     player.resetPosition();
                     for (Ghost g: ghosts)
                         g.resetPosition();
-                    if (info.getLives() == 0) {
+                    if (gameManager.checkGameOver(info)) {
                         db.addRecord(username, ScoreManager.getScore());
                         highScore = db.highScore();
                         highScoreName = db.highScoreName();
-                        gameManager.isGameStarted = false;
-                        gameManager.playerWon = false;
                         MyButton.showButtons();
                         pacmanLabel.setVisible(true);
-                        info.resetInfo();
-                        break;
                     }
                     break;
                 }
             }
-            if (gameManager.checkWinnig(pellets)) {
+            if (gameManager.checkWinning(pellets)) {
                 db.addRecord(username, ScoreManager.getScore());
                 highScore = db.highScore();
-                username = db.highScoreName();
+                highScoreName = db.highScoreName();
             }
         }
-    }
-
-    @Override
-    public void keyPressed (KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_UP) {
-            if (!Collision.checkDirectionCollision('U', player, walls)) {
-                player.updateDirection('U');
-                ScoreManager.addScore(-1);
-            }
-        }
-        else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            if (!Collision.checkDirectionCollision('D', player, walls)) {
-                player.updateDirection('D');
-                ScoreManager.addScore(-1);
-            }
-        }
-        else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            if (!Collision.checkDirectionCollision('R', player, walls)) {
-                player.updateDirection('R');
-                ScoreManager.addScore(-1);
-            }
-        }
-        else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            if (!Collision.checkDirectionCollision('L', player, walls)) {
-                player.updateDirection('L');
-                ScoreManager.addScore(-1);
-            }
-        }
-
-        if (player.direction == 'U')
-            player.img = images.pacmanUpImage;
-        else if (player.direction == 'D')
-            player.img = images.pacmanDownImage;
-        else if (player.direction == 'R')
-            player.img = images.pacmanRightImage;
-        else if (player.direction == 'L')
-            player.img = images.pacmanLeftImage;
     }
 
     @Override
@@ -205,11 +161,9 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
         repaint();
          
         if (e.getSource() == startButton) {
-            if (gameManager.firstTime) {
-                username = usernameField.getText();
-                usernameField.setVisible(false);
-                gameManager.firstTime = false;
-            }
+            username = usernameField.getText();
+            usernameField.setVisible(false);
+            gameManager.firstTime = false;
             info.resetInfo();
             gameManager.isGameStarted = true;
             for (Ghost g: ghosts)
@@ -230,10 +184,4 @@ public class MyPanel extends JPanel implements ActionListener, KeyListener {
             System.exit(0);
         }
     }
-
-    @Override
-    public void keyReleased (KeyEvent e) {}
-
-    @Override
-    public void keyTyped (KeyEvent e) {}
 }
