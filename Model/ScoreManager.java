@@ -2,17 +2,17 @@ package Model;
 
 public class ScoreManager {
     private int lives;
-    private static int score = 0;
+    private int score = 0;
 
     public ScoreManager (int lives) {
         this.lives = lives;
     }
-    public static int getScore () {
+    public int getScore () {
         return score;
     }
 
-    public static void setScore (int s) {
-        ScoreManager.score = s;
+    public void setScore (int s) {
+        score = s;
     }
 
     public int getLives () {
@@ -36,7 +36,7 @@ public class ScoreManager {
         score--;
     }
 
-    public static void addScore (int s) {
+    public void addScore (int s) {
         score += s;
     }
 }

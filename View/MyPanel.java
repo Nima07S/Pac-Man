@@ -18,22 +18,23 @@ public class MyPanel extends JPanel implements ActionListener {
     MyButton exitButton;
     MyLabel pacmanLabel;
     MyLabel winLabel;
-    JTextField usernameField;
+    MyTextField usernameField;
 
     String username = "";
 
     MyImage images = new MyImage();
 
+    ScoreManager info = new ScoreManager(3);
+
     ArrayList<Block> walls = new ArrayList<>();
     ArrayList<Block> pellets = new ArrayList<>();
     ArrayList<Ghost> ghosts = new ArrayList<>();
 
-    Pacman player = new Pacman(SIZE*9, SIZE*16, 32, 32, null);
+    Pacman player = new Pacman(SIZE*9, SIZE*16, 32, 32, null, info);
 
     Map map = new Map(images, pellets, walls, ghosts);
 
-    ScoreManager info = new ScoreManager(3);
-    GameManager gameManager = new GameManager();
+    GameManager gameManager = new GameManager(info);
 
     Timer loop;
 
@@ -42,6 +43,8 @@ public class MyPanel extends JPanel implements ActionListener {
     String highScoreName = "";
 
     Keyboard keyboard;
+
+    Motion motion;
 
     public MyPanel (Database database) {
         db = database;
@@ -53,16 +56,14 @@ public class MyPanel extends JPanel implements ActionListener {
         
         setLayout(null);
        
-        startButton = new MyButton("START", 22, 130, 450, 120, 80, this);
-        exitButton = new MyButton("EXIT", 22, 358, 450, 120, 80, this);
+        startButton = new MyButton("START", 16, 130, 475, 120, 70, this);
+        exitButton = new MyButton("EXIT", 16, 358, 475, 120, 70, this);
 
-        pacmanLabel = new MyLabel ("PacMan", 75, Color.YELLOW, 150, 75, 400, 200);
-        winLabel = new MyLabel("You Won!", 40, Color.WHITE, 200, 200, 300, 100);
+        pacmanLabel = new MyLabel ("PacMan", 70, Color.YELLOW, 50, 50, 500, 300);
+        winLabel = new MyLabel("You Won!", 40, Color.WHITE, 100, 300, 400, 100);
         winLabel.setVisible(false);
 
-        usernameField = new JTextField("Enter your name");
-        usernameField.setFont(new Font("Arial", Font.BOLD, 24));
-        usernameField.setBounds(200, 300, 200, 70);
+        usernameField = new MyTextField("Enter your name", 128, 330, 352, 70);
         usernameField.setVisible(true);
 
         add(startButton);
@@ -72,7 +73,7 @@ public class MyPanel extends JPanel implements ActionListener {
         add(usernameField);
         
         setFocusable(true);
-        keyboard = new Keyboard(player, walls, images);
+        keyboard = new Keyboard(player, walls, images, info);
         addKeyListener(keyboard);
 
         images.loadWall();
@@ -82,6 +83,8 @@ public class MyPanel extends JPanel implements ActionListener {
         player.img = images.pacmanRightImage;
         
         map.loadMaze();
+
+        motion = new Motion(player, ghosts, walls, pellets, gameManager, info);
                     
         // 1000 ms / 40 = 25 FPS
         loop = new Timer(40, this);
@@ -95,24 +98,23 @@ public class MyPanel extends JPanel implements ActionListener {
     }
 
     public void draw (Graphics g) {
-        for (Block w: walls) {
+        for (Block w: walls)
             g.drawImage(w.img, w.x, w.y, w.width, w.height, null);
-        }
 
         g.drawImage(player.img, player.x, player.y, player.width, player.height, null);
         
         g.setColor(Color.WHITE);
-        for (Block p: pellets) {
+        for (Block p: pellets)
             g.fillRect(p.x, p.y, p.width, p.height);
-        }
+
 
         for (Block G: ghosts) 
             g.drawImage(G.img, G.x, G.y, G.width, G.height, null);
 
-        g.setFont(new Font("Airal", Font.PLAIN, 20));
-        g.drawString("Score: " + ScoreManager.getScore(), 8, 24);
-        g.drawString("Lives: " + info.getLives(), 160, 24);
-        g.drawString("High Score: " + highScoreName + " " + highScore, 300, 24);
+        g.setFont(new Font("Emulogic", Font.PLAIN, 12));
+        g.drawString("Score:" + info.getScore(), 5, 24);
+        g.drawString("Lives:" + info.getLives(), 140, 24);
+        g.drawString("High Score: " + highScoreName + " " + highScore, 280, 24);
         
         if (!gameManager.isGameStarted) {
             g.setColor(new Color(0, 0, 0, 170));
@@ -124,40 +126,28 @@ public class MyPanel extends JPanel implements ActionListener {
         } 
     }
 
-    public void move () {
-        if (gameManager.isGameStarted) {
-            player.actualMove(walls, gameManager.isGameStarted);
-            player.teleporting();
-            Ghost.ghostsMove(ghosts, walls);
-            player.pacmanPelletCollision(player, pellets);
-        
-            for (Ghost ghost: ghosts) {
-                if (Collision.checkCollision(player, ghost)) {
-                    info.liveDecrement();
-                    player.resetPosition();
-                    for (Ghost g: ghosts)
-                        g.resetPosition();
-                    if (gameManager.checkGameOver(info)) {
-                        db.addRecord(username, ScoreManager.getScore());
-                        highScore = db.highScore();
-                        highScoreName = db.highScoreName();
-                        MyButton.showButtons();
-                        pacmanLabel.setVisible(true);
-                    }
-                    break;
-                }
-            }
-            if (gameManager.checkWinning(pellets)) {
-                db.addRecord(username, ScoreManager.getScore());
-                highScore = db.highScore();
-                highScoreName = db.highScoreName();
-            }
+    public void update () {
+        if (!gameManager.isGameStarted)
+            return;
+
+        motion.move();
+        if (gameManager.checkGameOver(info)) {
+            db.addRecord(username, info.getScore());
+            highScore = db.highScore();
+            highScoreName = db.highScoreName();
+            MyButton.showButtons();
+            pacmanLabel.setVisible(true);
+        }        
+        if (gameManager.checkWinning(pellets)) {
+            db.addRecord(username, info.getScore());
+            highScore = db.highScore();
+            highScoreName = db.highScoreName();
         }
     }
-
+    
     @Override
     public void actionPerformed (ActionEvent e) {
-        move();
+        update();
         repaint();
          
         if (e.getSource() == startButton) {

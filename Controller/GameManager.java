@@ -10,10 +10,15 @@ public class GameManager {
     public boolean eatenAllPellets = false;
     public boolean playerWon = false;
     public boolean firstTime = true;
+    private ScoreManager scoreManager;
+
+    public GameManager (ScoreManager sm) {
+        this.scoreManager = sm;
+    }
 
     public boolean checkWinning (ArrayList<Block> pellets) {
         if (pellets.isEmpty()) {
-            ScoreManager.addScore(500);
+            scoreManager.addScore(500);
             isGameStarted = false;
             eatenAllPellets = true;
             playerWon = true;

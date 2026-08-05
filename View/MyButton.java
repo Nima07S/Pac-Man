@@ -1,5 +1,6 @@
 package View;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
 import javax.swing.JButton;
@@ -9,9 +10,13 @@ public class MyButton extends JButton {
     
     public MyButton (String text, int size, int x, int y, int width, int height, MyPanel panel) {
         setText(text);
-        setFont(new Font("Arial", Font.BOLD, size));
+        setFont(new Font("Emulogic", Font.BOLD, size));
         setBounds(x, y, width, height);
         addActionListener(panel);
+        setFocusPainted(false);
+        setBorderPainted(false);
+        setBackground(Color.WHITE);
+        setForeground(Color.BLACK);
         buttons.add(this);
     }
 

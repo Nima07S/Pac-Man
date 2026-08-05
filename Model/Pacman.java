@@ -6,21 +6,23 @@ import java.awt.Image;
 import java.util.ArrayList;
 
 public class Pacman extends Block {
-    public static Block eatenPellet;
-    public static int eatenPelletCount;
+    private static Block eatenPellet;
+    private static int eatenPelletCount;
+    private ScoreManager scoreManager;
 
-    public Pacman (int x, int y, int width, int height, Image img) {
+    public Pacman (int x, int y, int width, int height, Image img, ScoreManager sm) {
         super(x, y, width, height, img);
         firstX = x;
         firstY = y;
         eatenPelletCount = 0;
+        scoreManager = sm;
     }
 
     public void pacmanPelletCollision (Block p, ArrayList<Block> foods) {
         for (Block f: foods) {
             if (Collision.checkCollision(p, f)) {
                 eatenPellet = f;
-                ScoreManager.addScore(10);
+                scoreManager.addScore(10);
                 break;
             }
         }
