@@ -9,13 +9,15 @@ public class Pacman extends Block {
     private static Block eatenPellet;
     private static int eatenPelletCount;
     private ScoreManager scoreManager;
+    private Sound sound;
 
-    public Pacman (int x, int y, int width, int height, Image img, ScoreManager sm) {
+    public Pacman (int x, int y, int width, int height, Image img, ScoreManager sm, Sound s) {
         super(x, y, width, height, img);
         firstX = x;
         firstY = y;
         eatenPelletCount = 0;
         scoreManager = sm;
+        sound = s;
     }
 
     public void pacmanPelletCollision (Block p, ArrayList<Block> foods) {
@@ -23,6 +25,7 @@ public class Pacman extends Block {
             if (Collision.checkCollision(p, f)) {
                 eatenPellet = f;
                 scoreManager.addScore(10);
+                sound.playChompMusic();
                 break;
             }
         }

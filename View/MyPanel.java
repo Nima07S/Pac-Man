@@ -26,15 +26,17 @@ public class MyPanel extends JPanel implements ActionListener {
 
     ScoreManager info = new ScoreManager(3);
 
+    Sound music = new Sound();
+
     ArrayList<Block> walls = new ArrayList<>();
     ArrayList<Block> pellets = new ArrayList<>();
     ArrayList<Ghost> ghosts = new ArrayList<>();
 
-    Pacman player = new Pacman(SIZE*9, SIZE*16, 32, 32, null, info);
+    Pacman player = new Pacman(SIZE*9, SIZE*16, 32, 32, null, info, music);
 
     Map map = new Map(images, pellets, walls, ghosts);
 
-    GameManager gameManager = new GameManager(info);
+    GameManager gameManager = new GameManager(info, music);
 
     Timer loop;
 
@@ -89,6 +91,8 @@ public class MyPanel extends JPanel implements ActionListener {
         // 1000 ms / 40 = 25 FPS
         loop = new Timer(40, this);
         loop.start();
+
+        music.playBeginningMusic();
     }
 
     @Override
@@ -142,6 +146,7 @@ public class MyPanel extends JPanel implements ActionListener {
             db.addRecord(username, info.getScore());
             highScore = db.highScore();
             highScoreName = db.highScoreName();
+            music.playWinMusic();
         }
     }
     

@@ -2,6 +2,7 @@ package Controller;
 
 import Model.Block;
 import Model.ScoreManager;
+import Model.Sound;
 
 import java.util.ArrayList;
 
@@ -11,9 +12,11 @@ public class GameManager {
     public boolean playerWon = false;
     public boolean firstTime = true;
     private ScoreManager scoreManager;
+    private Sound sound;
 
-    public GameManager (ScoreManager sm) {
+    public GameManager (ScoreManager sm, Sound s) {
         this.scoreManager = sm;
+        this.sound = s;
     }
 
     public boolean checkWinning (ArrayList<Block> pellets) {
@@ -32,6 +35,7 @@ public class GameManager {
             isGameStarted = false;
             playerWon = false;
             eatenAllPellets = false;
+            sound.playLoseMusic();
             return true;
         }
         return false;
