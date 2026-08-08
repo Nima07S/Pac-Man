@@ -6,17 +6,17 @@ import javax.swing.ImageIcon;
 import java.awt.Image;
 
 public class MyImage {
-    public Image wallImage;
+    private Image wallImage;
 
-    public Image pacmanRightImage;
-    public Image pacmanLeftImage;
-    public Image pacmanUpImage;
-    public Image pacmanDownImage;
+    private Image pacmanRightImage;
+    private Image pacmanLeftImage;
+    private Image pacmanUpImage;
+    private Image pacmanDownImage;
 
-    public Image redGhostImage;
-    public Image greenGhostImage;
-    public Image orangeGhostImage;
-    public Image pinkGhostImage;
+    private Image redGhostImage;
+    private Image greenGhostImage;
+    private Image orangeGhostImage;
+    private Image pinkGhostImage;
 
     public void loadWall () {
         wallImage = new ImageIcon(getClass().getResource("/assets/wall.png")).getImage();
@@ -37,13 +37,32 @@ public class MyImage {
     }
 
     public void setPacManImage (Pacman player) {
-        if (player.direction == 'U')
-            player.img = pacmanUpImage;
-        else if (player.direction == 'D')
-            player.img = pacmanDownImage;
-        else if (player.direction == 'R')
-            player.img = pacmanRightImage;
-        else if (player.direction == 'L')
-            player.img = pacmanLeftImage;
+        if (player.getDirection() == 'U')
+            player.setImage(pacmanUpImage);
+        else if (player.getDirection() == 'D')
+            player.setImage(pacmanDownImage);
+        else if (player.getDirection() == 'R')
+            player.setImage(pacmanRightImage);
+        else if (player.getDirection() == 'L')
+            player.setImage(pacmanLeftImage);
+    }
+
+    public Image getRightPacmanImage () {
+        return pacmanRightImage;
+    }
+    public Image getWallImage () {
+        return wallImage;
+    }
+    public Image getRedGhostImage () {
+        return redGhostImage;
+    }
+    public Image getGreenGhostImage () {
+        return greenGhostImage;
+    }
+    public Image getOrangeGhostImage () {
+        return orangeGhostImage;
+    }
+    public Image getPinkGhostImage () {
+        return pinkGhostImage;
     }
 }

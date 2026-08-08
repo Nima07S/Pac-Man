@@ -51,7 +51,7 @@ public class Map {
             for (int j=0; j<getMaze()[i].length(); j++) {
                 switch (getMaze()[i].charAt(j)) {
                     case 'x':
-                        Block wall = new Block(32*j, 32*i, SIZE, SIZE, images.wallImage);
+                        Block wall = new Block(32*j, 32*i, SIZE, SIZE, images.getWallImage());
                         walls.add(wall);
                         break;
                     case ' ':
@@ -59,20 +59,31 @@ public class Map {
                         pellets.add(pellet);
                         break;
                     case 'R':
-                        Ghost redGhost = new Ghost(SIZE*9, SIZE*9, SIZE, SIZE, images.redGhostImage);
+                        Ghost redGhost = new Ghost(SIZE*9, SIZE*9, SIZE, SIZE, images.getRedGhostImage());
                         ghosts.add(redGhost);
                         break;
                     case 'G':
-                        Ghost greenGhost = new Ghost(SIZE*8, SIZE*10, SIZE, SIZE, images.greenGhostImage);
+                        Ghost greenGhost = new Ghost(SIZE*8, SIZE*10, SIZE, SIZE, images.getGreenGhostImage());
                         ghosts.add(greenGhost);
                         break;
                     case 'O':
-                        Ghost orangeGhost = new Ghost(SIZE*10, SIZE*10, SIZE, SIZE, images.orangeGhostImage);
+                        Ghost orangeGhost = new Ghost(SIZE*10, SIZE*10, SIZE, SIZE, images.getOrangeGhostImage());
                         ghosts.add(orangeGhost);
                         break;
                     case 'P':
-                        Ghost pinkGhost = new Ghost(SIZE*9, SIZE*11, SIZE, SIZE, images.pinkGhostImage);
+                        Ghost pinkGhost = new Ghost(SIZE*9, SIZE*11, SIZE, SIZE, images.getPinkGhostImage());
                         ghosts.add(pinkGhost);
+                }
+            }
+        }
+    }
+
+    public void loadPellets () {
+        for (int i=0; i<getMaze().length; i++) {
+            for (int j=0; j<getMaze()[i].length(); j++) {
+                if (getMaze()[i].charAt(j) == ' ') {
+                    Block pellet = new Block(j*32+13, i*32+13, 6, 6, null);
+                        pellets.add(pellet);
                 }
             }
         }

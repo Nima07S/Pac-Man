@@ -8,17 +8,20 @@ public class Sound {
     private Clip chompClip;
     private Clip winClip;
     private Clip loseClip;
+    private Clip backgroundClip;
 
     private String pacmanBeginning = "/assets/pacmanBeginning.wav";
     private  String pacmanChomp = "/assets/pacmanChomp.wav";
     private  String pacmanlose = "/assets/pacmanLose.wav";
     private String pacmanWin = "/assets/pacmanWin.wav";
+    private String background = "/assets/background.wav";
 
     public Sound () {
         beginningClip = loadClip(pacmanBeginning);
         chompClip = loadClip(pacmanChomp);
         winClip = loadClip(pacmanWin);
         loseClip = loadClip(pacmanlose);
+        backgroundClip = loadClip(background);
     }
     
     public Clip loadClip (String path) {
@@ -45,6 +48,12 @@ public class Sound {
         if (clip != null) {
             clip.setFramePosition(0);
             clip.start();
+        }
+    }
+    public void playBackMusic () {
+        if (backgroundClip != null) {
+            backgroundClip.start();
+            backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
         }
     }
 

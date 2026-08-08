@@ -9,22 +9,22 @@ import java.util.ArrayList;
 public class Collision {
 
     public static boolean checkCollision (int x, int y, Block p, Block b) {
-        Rectangle playerRect = new Rectangle(x, y, p.width, p.height);
-        Rectangle blockRect = new Rectangle(b.x, b.y, b.width, b.height);
+        Rectangle playerRect = new Rectangle(x, y, p.getWidth(), p.getHeight());
+        Rectangle blockRect = new Rectangle(b.getX(), b.getY(), b.getWidth(), b.getHeight());
         Boolean check = playerRect.intersects(blockRect);
         return check;
     }
 
     public static boolean checkCollision (Block p, Block b) {
-        Rectangle playerRect = new Rectangle(p.x, p.y, p.width, p.height);
-        Rectangle blockRect = new Rectangle(b.x, b.y, b.width, b.height);
+        Rectangle playerRect = new Rectangle(p.getX(), p.getY(), p.getWidth(), p.getHeight());
+        Rectangle blockRect = new Rectangle(b.getX(), b.getY(), b.getWidth(), b.getHeight());
         Boolean check = playerRect.intersects(blockRect);
         return check;
     }
 
     public static boolean checkVelocityCollision(int xVelocity, int yVelocity, Pacman player, ArrayList<Block> walls) {
-        int tmpPlayerX = player.x;
-        int tmpPlayerY = player.y;
+        int tmpPlayerX = player.getX();
+        int tmpPlayerY = player.getY();
         tmpPlayerX += xVelocity;
         tmpPlayerY += yVelocity;
         for (Block w: walls) {

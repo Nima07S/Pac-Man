@@ -18,6 +18,7 @@ public class MyPanel extends JPanel implements ActionListener {
     MyButton exitButton;
     MyLabel pacmanLabel;
     MyLabel winLabel;
+    MyLabel loseLabel;
     MyTextField usernameField;
 
     String username = "";
@@ -64,6 +65,8 @@ public class MyPanel extends JPanel implements ActionListener {
         pacmanLabel = new MyLabel ("PacMan", 70, Color.YELLOW, 50, 50, 500, 300);
         winLabel = new MyLabel("You Won!", 40, Color.WHITE, 100, 300, 400, 100);
         winLabel.setVisible(false);
+        loseLabel = new MyLabel("GameOver", 40, Color.WHITE, 100, 300, 400, 100);
+        loseLabel.setVisible(false);
 
         usernameField = new MyTextField("Enter your name", 128, 330, 352, 70);
         usernameField.setVisible(true);
@@ -72,6 +75,7 @@ public class MyPanel extends JPanel implements ActionListener {
         add(exitButton);
         add(pacmanLabel);
         add(winLabel);
+        add(loseLabel);
         add(usernameField);
         
         setFocusable(true);
@@ -82,7 +86,7 @@ public class MyPanel extends JPanel implements ActionListener {
         images.loadPacman();
         images.loadGhosts();
 
-        player.img = images.pacmanRightImage;
+        player.setImage(images.getRightPacmanImage());
         
         map.loadMaze();
 
@@ -103,21 +107,21 @@ public class MyPanel extends JPanel implements ActionListener {
 
     public void draw (Graphics g) {
         for (Block w: walls)
-            g.drawImage(w.img, w.x, w.y, w.width, w.height, null);
+            g.drawImage(w.getImage(), w.getX(), w.getY(), w.getWidth(), w.getHeight(), null);
 
-        g.drawImage(player.img, player.x, player.y, player.width, player.height, null);
+        g.drawImage(player.getImage(), player.getX(), player.getY(), player.getWidth(), player.getHeight(), null);
         
         g.setColor(Color.WHITE);
         for (Block p: pellets)
-            g.fillRect(p.x, p.y, p.width, p.height);
+            g.fillRect(p.getX(), p.getY(), p.getWidth(), p.getHeight());
 
 
         for (Block G: ghosts) 
-            g.drawImage(G.img, G.x, G.y, G.width, G.height, null);
+            g.drawImage(G.getImage(), G.getX(), G.getY(), G.getWidth(), G.getHeight(), null);
 
         g.setFont(new Font("Emulogic", Font.PLAIN, 12));
         g.drawString("Score:" + info.getScore(), 5, 24);
-        g.drawString("Lives:" + info.getLives(), 140, 24);
+        g.drawString("Lives:" + info.getLives(), 150, 24);
         g.drawString("High Score: " + highScoreName + " " + highScore, 280, 24);
         
         if (!gameManager.isGameStarted) {
@@ -127,7 +131,9 @@ public class MyPanel extends JPanel implements ActionListener {
             pacmanLabel.setVisible(true);
             if (gameManager.playerWon)
                 winLabel.setVisible(true);
-        } 
+            else if (!gameManager.firstTime)
+                loseLabel.setVisible(true);
+        }
     }
 
     public void update () {
@@ -165,14 +171,15 @@ public class MyPanel extends JPanel implements ActionListener {
                 g.resetPosition();
             player.resetPosition();
             pellets.clear();
-            Pellet.loadPellets(pellets, map);
+            map.loadPellets();
             MyButton.hideButtons();
-            MyLabel.hideLabels(pacmanLabel, winLabel);
+            MyLabel.hideLabels(pacmanLabel, winLabel, loseLabel);
             gameManager.eatenAllPellets = false;
             if (info.getLives() == 0 || pellets.isEmpty()) {
-                Pellet.loadPellets(pellets, map);
+                map.loadPellets();
                 gameManager.eatenAllPellets = false;
             }
+            music.playBackMusic();
         }
         else if (e.getSource() == exitButton) {
             db.disconnect();

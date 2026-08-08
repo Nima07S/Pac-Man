@@ -3,16 +3,15 @@ package Model;
 import java.awt.Image;
 
 public class Block {
-    public int x, y;
-    public int width, height;
-    public Image img;
-    public int xVelocity, yVelocity;
-    public char direction;
-    public char preDirection;
-    protected int firstX;
-    protected int firstY;
-    private int firstWidth;
-    private int firstHeight;
+    protected int x, y;
+    protected int firstX, firstY;
+    protected int width, height;
+    protected int xVelocity, yVelocity;
+    protected int firstWidth;
+    protected int firstHeight;
+    protected Image img;
+    protected char direction;
+    protected char preDirection;
 
     public Block (int x, int y, int width, int height, Image img) {
         this.x = x;
@@ -71,5 +70,39 @@ public class Block {
         y = firstY;
         width = firstWidth;
         height = firstHeight;
+    }
+
+    public int getX () {
+        return x;
+    }
+    public int getY () {
+        return y;
+    }
+    public int getWidth () {
+        return width;
+    }
+    public int getHeight () {
+        return height;
+    }
+    public int getXVelocity () {
+        return xVelocity;
+    }
+    public int getYVelocity () {
+        return yVelocity;
+    }
+    public Image getImage () {
+        return img;
+    }
+    public void setImage (Image image) {
+        img = image;
+    }
+    public char getDirection () {
+        return direction;
+    }
+    public void setDirection (char c) {
+        direction = c;
+    }
+    public char getPreDirection () {
+        return preDirection;
     }
 }
