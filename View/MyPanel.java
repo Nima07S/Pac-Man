@@ -59,8 +59,8 @@ public class MyPanel extends JPanel implements ActionListener {
         
         setLayout(null);
        
-        startButton = new MyButton("START", 16, 130, 475, 120, 70, this);
-        exitButton = new MyButton("EXIT", 16, 358, 475, 120, 70, this);
+        startButton = new MyButton("START", 16, 130, 525, 120, 70, this);
+        exitButton = new MyButton("EXIT", 16, 358, 525, 120, 70, this);
 
         pacmanLabel = new MyLabel ("PacMan", 70, Color.YELLOW, 50, 50, 500, 300);
         winLabel = new MyLabel("You Won!", 40, Color.WHITE, 100, 300, 400, 100);
@@ -68,7 +68,7 @@ public class MyPanel extends JPanel implements ActionListener {
         loseLabel = new MyLabel("GameOver", 40, Color.WHITE, 100, 300, 400, 100);
         loseLabel.setVisible(false);
 
-        usernameField = new MyTextField("Enter your name", 128, 330, 352, 70);
+        usernameField = new MyTextField("Enter your name", 128, 420, 352, 60);
         usernameField.setVisible(true);
 
         add(startButton);
@@ -147,12 +147,16 @@ public class MyPanel extends JPanel implements ActionListener {
             highScoreName = db.highScoreName();
             MyButton.showButtons();
             pacmanLabel.setVisible(true);
+            usernameField.setText(username);
+            usernameField.setVisible(true);
         }        
         if (gameManager.checkWinning(pellets)) {
             db.addRecord(username, info.getScore());
             highScore = db.highScore();
             highScoreName = db.highScoreName();
             music.playWinMusic();
+            usernameField.setText(username);
+            usernameField.setVisible(true);
         }
     }
     
