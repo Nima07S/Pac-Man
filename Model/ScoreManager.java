@@ -2,10 +2,13 @@ package Model;
 
 public class ScoreManager {
     private int lives;
-    private int score = 0;
+    private int copyLive;
+    private int score;
 
     public ScoreManager (int lives) {
         this.lives = lives;
+        copyLive = lives;
+        lives = 0;
     }
     public int getScore () {
         return score;
@@ -24,7 +27,7 @@ public class ScoreManager {
     }
 
     public void resetInfo () {
-        lives = 3;
+        lives = copyLive;
         setScore(0);
     }
 

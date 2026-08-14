@@ -17,6 +17,7 @@
 <h4 align="right">
 این پروژه مربوط به بازی کلاسیک Pac-Man می‌باشد که با رعایت اصول شی‌گرایی (OOP) و با زبان جاوا نوشته شده است. 
 </h4>
+<a href="https://github.com/Nima07S/Pac-Man"> لینک ریپوی پروژه </a>
 
 ---
 
@@ -46,6 +47,7 @@
     <span dir="rtl"><code dir="ltr">java.util.ArrayList</code> (ساخت ArrayList) </span>، 
     <span dir="rtl"><code dir="ltr">java.util.Random</code> (تولید اعداد تصادفی). </span>
 </li>
+<li>درایور مربوط به پایگاه داده (<code>sqlite-jdbc-3.53.2.1</code>) در پوشه <b>lib</b> قرار دارد که پایگاه داده را به بازی متصل می‌کند.</li>
 </ul>
 
 ---

@@ -25,7 +25,7 @@ public class MyPanel extends JPanel implements ActionListener {
 
     MyImage images = new MyImage();
 
-    ScoreManager info = new ScoreManager(3);
+    ScoreManager info = new ScoreManager(1);
 
     Sound music = new Sound();
 
@@ -37,7 +37,7 @@ public class MyPanel extends JPanel implements ActionListener {
 
     Map map = new Map(images, pellets, walls, ghosts);
 
-    GameManager gameManager = new GameManager(info, music);
+    Game game = new Game(info, music);
 
     Timer loop;
 
@@ -90,7 +90,7 @@ public class MyPanel extends JPanel implements ActionListener {
         
         map.loadMaze();
 
-        motion = new Motion(player, ghosts, walls, pellets, gameManager, info);
+        motion = new Motion(player, ghosts, walls, pellets, game, info);
                     
         // 1000 ms / 40 = 25 FPS
         loop = new Timer(40, this);
@@ -124,24 +124,24 @@ public class MyPanel extends JPanel implements ActionListener {
         g.drawString("Lives:" + info.getLives(), 150, 24);
         g.drawString("High Score: " + highScoreName + " " + highScore, 280, 24);
         
-        if (!gameManager.isGameStarted) {
+        if (!game.isGameStarted) {
             g.setColor(new Color(0, 0, 0, 170));
             g.fillRect(0, 0, width, height);
             MyButton.showButtons();
             pacmanLabel.setVisible(true);
-            if (gameManager.playerWon)
+            if (game.playerWon)
                 winLabel.setVisible(true);
-            else if (!gameManager.firstTime)
+            else if (!game.firstTime)
                 loseLabel.setVisible(true);
         }
     }
 
     public void update () {
-        if (!gameManager.isGameStarted)
+        if (!game.isGameStarted)
             return;
 
         motion.move();
-        if (gameManager.checkGameOver(info)) {
+        if (game.checkGameOver(info)) {
             db.addRecord(username, info.getScore());
             highScore = db.highScore();
             highScoreName = db.highScoreName();
@@ -150,11 +150,10 @@ public class MyPanel extends JPanel implements ActionListener {
             usernameField.setText(username);
             usernameField.setVisible(true);
         }        
-        if (gameManager.checkWinning(pellets)) {
+        if (game.checkWinning(pellets)) {
             db.addRecord(username, info.getScore());
             highScore = db.highScore();
             highScoreName = db.highScoreName();
-            music.playWinMusic();
             usernameField.setText(username);
             usernameField.setVisible(true);
         }
@@ -168,9 +167,9 @@ public class MyPanel extends JPanel implements ActionListener {
         if (e.getSource() == startButton) {
             username = usernameField.getText();
             usernameField.setVisible(false);
-            gameManager.firstTime = false;
+            game.firstTime = false;
             info.resetInfo();
-            gameManager.isGameStarted = true;
+            game.isGameStarted = true;
             for (Ghost g: ghosts)
                 g.resetPosition();
             player.resetPosition();
@@ -178,10 +177,10 @@ public class MyPanel extends JPanel implements ActionListener {
             map.loadPellets();
             MyButton.hideButtons();
             MyLabel.hideLabels(pacmanLabel, winLabel, loseLabel);
-            gameManager.eatenAllPellets = false;
+            game.eatenAllPellets = false;
             if (info.getLives() == 0 || pellets.isEmpty()) {
                 map.loadPellets();
-                gameManager.eatenAllPellets = false;
+                game.eatenAllPellets = false;
             }
             music.playBackMusic();
         }

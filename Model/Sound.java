@@ -60,10 +60,10 @@ public class Sound {
     public void playBeginningMusic () {
         playMusic(beginningClip);
     }
-    public  void playChompMusic () {
+    public void playChompMusic () {
         playMusic(chompClip);
     }
-    public  void playLoseMusic () {
+    public void playLoseMusic () {
         playMusic(loseClip);
     }
     public void playWinMusic () {

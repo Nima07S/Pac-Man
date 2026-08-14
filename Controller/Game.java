@@ -6,7 +6,7 @@ import Model.Sound;
 
 import java.util.ArrayList;
 
-public class GameManager {
+public class Game {
     public boolean isGameStarted = false;
     public boolean eatenAllPellets = false;
     public boolean playerWon = false;
@@ -14,7 +14,7 @@ public class GameManager {
     private ScoreManager scoreManager;
     private Sound sound;
 
-    public GameManager (ScoreManager sm, Sound s) {
+    public Game (ScoreManager sm, Sound s) {
         this.scoreManager = sm;
         this.sound = s;
     }
@@ -25,6 +25,7 @@ public class GameManager {
             isGameStarted = false;
             eatenAllPellets = true;
             playerWon = true;
+            sound.playWinMusic();
             return true;
         }
         return false;
